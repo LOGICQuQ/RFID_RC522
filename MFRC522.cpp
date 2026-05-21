@@ -6,6 +6,8 @@
 
 #include "MFRC522.h"
 
+using namespace std::chrono_literals;
+
 static const char* const _TypeNamePICC[] =
 {
   "Unknown type",
@@ -84,6 +86,7 @@ MFRC522::~MFRC522()
  */
 void MFRC522::PCD_WriteRegister(uint8_t reg, uint8_t value)
 {
+  m_SPI.lock();
   m_CS = 0; /* Select SPI Chip MFRC522 */
 
   // MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
@@ -91,6 +94,7 @@ void MFRC522::PCD_WriteRegister(uint8_t reg, uint8_t value)
   (void) m_SPI.write(value);
 
   m_CS = 1; /* Release SPI Chip MFRC522 */
+  m_SPI.unlock();
 } // End PCD_WriteRegister()
 
 /**
@@ -99,6 +103,7 @@ void MFRC522::PCD_WriteRegister(uint8_t reg, uint8_t value)
  */
 void MFRC522::PCD_WriteRegister(uint8_t reg, uint8_t count, uint8_t *values)
 {
+  m_SPI.lock();
   m_CS = 0; /* Select SPI Chip MFRC522 */
 
   // MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
@@ -109,6 +114,7 @@ void MFRC522::PCD_WriteRegister(uint8_t reg, uint8_t count, uint8_t *values)
   }
 
   m_CS = 1; /* Release SPI Chip MFRC522 */
+  m_SPI.unlock();
 } // End PCD_WriteRegister()
 
 /**
@@ -118,6 +124,7 @@ void MFRC522::PCD_WriteRegister(uint8_t reg, uint8_t count, uint8_t *values)
 uint8_t MFRC522::PCD_ReadRegister(uint8_t reg)
 {
   uint8_t value;
+  m_SPI.lock();
   m_CS = 0; /* Select SPI Chip MFRC522 */
 
   // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
@@ -127,6 +134,7 @@ uint8_t MFRC522::PCD_ReadRegister(uint8_t reg)
   value = m_SPI.write(0);
 
   m_CS = 1; /* Release SPI Chip MFRC522 */
+  m_SPI.unlock();
 
   return value;
 } // End PCD_ReadRegister()
@@ -142,6 +150,7 @@ void MFRC522::PCD_ReadRegister(uint8_t reg, uint8_t count, uint8_t *values, uint
   uint8_t address = 0x80 | reg;  // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
   uint8_t index = 0;             // Index in values array.
 
+  m_SPI.lock();
   m_CS = 0;                      /* Select SPI Chip MFRC522 */
   count--;                       // One read is performed outside of the loop
   (void) m_SPI.write(address);   // Tell MFRC522 which address we want to read
@@ -175,6 +184,7 @@ void MFRC522::PCD_ReadRegister(uint8_t reg, uint8_t count, uint8_t *values, uint
   values[index] = m_SPI.write(0); // Read the final byte. Send 0 to stop reading.
 
   m_CS = 1;                       /* Release SPI Chip MFRC522 */
+  m_SPI.unlock();
 } // End PCD_ReadRegister()
 
 /**

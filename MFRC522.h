@@ -7,8 +7,9 @@
 * MFRC522 example
 *
 * @code
-* #include "mbed.h"
-* #include "MFRC522.h"
+ * #include "mbed.h"
+ * #include "MFRC522.h"
+ * using namespace std::chrono_literals;
 *
 * //KL25Z Pins for MFRC522 SPI interface
 * #define SPI_MOSI    PTC6
@@ -24,15 +25,11 @@
 * DigitalOut LedRed   (LED_RED);
 * DigitalOut LedGreen (LED_GREEN);
 *
-* Serial     DebugUART(UART_TX, UART_RX);
-* MFRC522    RfChip   (SPI_MOSI, SPI_MISO, SPI_SCLK, SPI_CS, MF_RESET);
-*
-* int main(void) {
-*   // Set debug UART speed
-*   DebugUART.baud(115200);
-*
-*   // Init. RC522 Chip
-*   RfChip.PCD_Init();
+ * MFRC522    RfChip   (SPI_MOSI, SPI_MISO, SPI_SCLK, SPI_CS, MF_RESET);
+ *
+ * int main(void) {
+ *   // Init. RC522 Chip
+ *   RfChip.PCD_Init();
 *
 *   while (true) {
 *     LedRed   = 1;
@@ -41,18 +38,18 @@
 *     // Look for new cards
 *     if ( ! RfChip.PICC_IsNewCardPresent())
 *     {
-*       wait_ms(500);
-*       continue;
-*     }
+ *       ThisThread::sleep_for(500ms);
+ *       continue;
+ *     }
 *
 *     LedRed   = 0;
 *
 *     // Select one of the cards
 *     if ( ! RfChip.PICC_ReadCardSerial())
 *     {
-*       wait_ms(500);
-*       continue;
-*     }
+ *       ThisThread::sleep_for(500ms);
+ *       continue;
+ *     }
 *
 *     LedRed   = 1;
 *     LedGreen = 0;
@@ -68,9 +65,9 @@
 *     // Print Card type
 *     uint8_t piccType = RfChip.PICC_GetType(RfChip.uid.sak);
 *     printf("PICC Type: %s \n\r", RfChip.PICC_GetTypeName(piccType));
-*     wait_ms(1000);
-*   }
-* }
+ *     ThisThread::sleep_for(1000ms);
+ *   }
+ * }
 * @endcode
 */
 
